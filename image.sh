@@ -1,16 +1,21 @@
 #!/bin/bash
 if [ "$#" -lt 1 ] ; then
-    files="*.jpg"
+    files=$(find ./ -iname '*.jpg' -and \! -iname '*_thumbnail.jpg')
 else
     files=$(cat $1)
 fi
 
 for file in $files ;
 do
-    if identify -format "%w" $file > identify -format "%h" $file ; then
-        convert $file -resize 320 _thumbnail$file
+    
+    width=$(identify -format "%w" $file)
+    height=$(identify -format "%h" $file)
+    if [ $width -gt $height ] ; then
+        echo "width"
+        convert $file -resize 320! ${file/.jpg/_thumbnail.jpg}
     else
-        convert $file -resize x320 _thumbnail$file
+        echo "height"
+        convert $file -resize x320! ${file/.jpg/_thumbnail.jpg}
     fi
 done
 
